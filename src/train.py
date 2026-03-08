@@ -53,7 +53,7 @@ def main(cfg: DictConfig) -> None:
     safe_cfg = OmegaConf.to_container(cfg, resolve=True)
 
     # Wandb
-    wandb.init(project="stress-project", config=safe_cfg)
+    wandb.init(project="Stress-Identification", config=safe_cfg)
     
     # Training loop
     for epoch in range(cfg.training.epochs):

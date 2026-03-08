@@ -1,31 +1,161 @@
-# **Stress detection with lightweight CNNs**
+# Vision-Module
 
-Repository for the project related to Stress Detection employing lightweight CNNs. The CNNs architectures used for the task are: MobileNet-v3-small, EfficientNet-B2, EfficientNet-V2-small, MNASNet 1, ShuffleNet V2 1x and SqueezeNet V1.1.
+**Repository:** https://github.com/271828D/Vision-Module
 
-## **Installation**
+A PyTorch-based computer vision project for stress identification using pretrained models (EfficientNet, MobileNet). This module provides a configurable training pipeline with Hydra configuration management and Weights & Biases integration for experiment tracking.
 
+## Features
+
+- Multiple pretrained architectures (EfficientNet-B2, EfficientNetV2-S, MobileNetV3-Small)
+- Hydra-based configuration system for easy experimentation
+- Weights & Biases integration for experiment tracking
+- Early stopping with patience-based validation
+- CUDA 12.6 support for GPU acceleration
+- Automated checkpoint saving with timestamps
+
+## Prerequisites
+
+- Python 3.12
+- CUDA 12.6 (for GPU support)
+- [uv](https://docs.astral.sh/uv/) package manager
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/271828D/Vision-Module.git
+   cd Vision-Module
+   ```
+
+2. Install dependencies using uv:
+   ```bash
+   uv sync
+   ```
+
+3. (Optional) Set up Weights & Biases:
+   ```bash
+   wandb login
+   ```
+
+## Configuration
+
+Before running, configure your data paths in `configs/data/dataloader.yaml`:
+
+```yaml
+csv_file: /path/to/your/train.csv
+batch_size: 28
+num_workers: 4
 ```
-# Create and activate virtual environment
-uv venv .venv
-source .venv/bin/activate  # Unix
-.venv\Scripts\activate     # Windows
 
-# Install dependencies
-uv sync
+### Configuration Files
 
-# Run training
+- `configs/config.yaml` - Main configuration (seed, model selection)
+- `configs/model/` - Model architectures (effb2, effv2s, mobilev3s)
+- `configs/data/dataloader.yaml` - Data loading parameters
+- `configs/training/default.yaml` - Training hyperparameters
+
+## Usage
+
+### Basic Training
+
+Run training with default settings (EfficientNet-B2, seed=42):
+
+```bash
 python src/train.py
 ```
 
-## **Dataset**
+### Custom Configuration
 
-The dataset used was an unimodal subset of face images of subjects from the StressID.
+Override specific parameters:
 
-## **Training**
+```bash
+# Change model
+python src/train.py model=mobilev3s
 
-## **Model Architecture**
+# Change hyperparameters
+python src/train.py training.epochs=50 training.lr=0.001
 
+# Change seed
+python src/train.py seed=123
 
-## **Results**
+# Combine multiple overrides
+python src/train.py model=effv2s seed=999 training.epochs=75
+```
 
-## **License**
+### Available Models
+
+- `effb2` - EfficientNet-B2 (default)
+- `effv2s` - EfficientNetV2-Small
+- `mobilev3s` - MobileNetV3-Small
+
+## Output
+
+Training outputs are saved to:
+```
+outputs/{model_name}/{seed}/
+```
+
+Model checkpoints are saved as:
+```
+model_{model}_{seed}_{timestamp}.pth
+```
+
+## Project Structure
+
+```
+Vision-Module/
+├── configs/           # Hydra configuration files
+│   ├── data/         # Data loading configs
+│   ├── model/        # Model architecture configs
+│   ├── training/     # Training hyperparameters
+│   └── config.yaml   # Main config
+├── src/
+│   ├── data/         # Dataset and dataloader modules
+│   ├── engine/       # Training and validation loops
+│   ├── models/       # Model definitions
+│   ├── utils/        # Utility functions
+│   └── train.py      # Main training script
+├── notebooks/        # Jupyter notebooks for experimentation
+└── pyproject.toml    # Project dependencies
+```
+
+## Development
+
+Development dependencies are included in the `dev` dependency group:
+
+```bash
+# Already installed with uv sync
+# Includes: jupyter, matplotlib, pandas, pytest, pre-commit, black
+```
+
+### Code Formatting
+
+The project uses Black with line length 79:
+```bash
+black src/
+```
+
+### Pre-commit Hooks
+
+```bash
+pre-commit install
+pre-commit run --all-files
+```
+
+## Training Features
+
+- **Early Stopping:** Stops training if validation loss doesn't improve for 5 epochs
+- **Best Model Saving:** Automatically saves the model with the lowest validation loss
+- **Progress Tracking:** Real-time progress bars with tqdm
+- **Experiment Logging:** All metrics logged to Weights & Biases
+
+## License
+
+See repository for license information.
+
+## Citation
+
+If you use this code, please cite the repository:
+```
+https://github.com/271828D/Vision-Module
+```

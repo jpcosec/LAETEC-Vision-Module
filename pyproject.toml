@@ -1,5 +1,7 @@
+[tool.uv]
+environment = ".vision-module"   
 [project]
-name = "datapreprocessing"
+name = "Stress-Identification"
 version = "0.1.0"
 description = "Tool to extract frames from videos with OpenCV"
 readme = "README.md"
