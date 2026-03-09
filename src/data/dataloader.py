@@ -4,6 +4,32 @@ from torchvision.transforms import v2
 from sklearn.model_selection import train_test_split, GroupShuffleSplit
 from src.data.dataset import CustomDataset
 
+def get_data_loaders_from_split_files(train_csv:str, val_csv:str, batch_size=32, num_workers=4):
+    """Load train and validation data from pre-split CSV files (subject-based splits)"""
+    train_df = pd.read_csv(train_csv, sep=";")
+    val_df = pd.read_csv(val_csv, sep=";")
+
+    transform_data_aug = v2.Compose([
+        v2.Resize((224, 224)),
+        v2.RandomHorizontalFlip(p=0.7),
+        v2.ToTensor(),
+        v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    transform_val = v2.Compose([
+        v2.Resize((224, 224)),
+        v2.ToTensor(),
+        v2.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ])
+
+    train_dataset = CustomDataset(train_df, transform=transform_data_aug)
+    val_dataset = CustomDataset(val_df, transform=transform_val)
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+
+    return train_loader, val_loader
+
 def get_data_loaders(csv_file:str, split="train", test_size=0.1, batch_size=32, num_workers=4, transform=None, random_state=42):
     df = pd.read_csv(csv_file, sep=";")
     train_df, val_df = train_test_split(df, test_size=test_size, stratify=df['label'], random_state=random_state)
