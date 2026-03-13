@@ -1,0 +1,6 @@
+pipeline: classification
+entrypoint: src/train.py
+output_subdir: ${model.model}/${seed}
+wandb:
+  enabled: true
+  project: Stress-Identification

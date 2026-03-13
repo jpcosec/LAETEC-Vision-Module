@@ -4,6 +4,8 @@
 
 A PyTorch-based computer vision project for stress identification using pretrained models (EfficientNet, MobileNet). This module provides a configurable training pipeline with Hydra configuration management and Weights & Biases integration for experiment tracking.
 
+New here? Start with `docs/entrypoint.md`.
+
 ## Features
 
 - Multiple pretrained architectures (EfficientNet-B2, EfficientNetV2-S, MobileNetV3-Small)
@@ -42,7 +44,9 @@ A PyTorch-based computer vision project for stress identification using pretrain
 Before running, configure your data paths in `configs/data/dataloader.yaml`:
 
 ```yaml
-csv_file: /path/to/your/train.csv
+train_csv: /path/to/your/train.csv
+val_csv: /path/to/your/val.csv
+test_csv: /path/to/your/test.csv
 batch_size: 28
 num_workers: 4
 ```
@@ -53,6 +57,7 @@ num_workers: 4
 - `configs/model/` - Model architectures (effb2, effv2s, mobilev3s)
 - `configs/data/dataloader.yaml` - Data loading parameters
 - `configs/training/default.yaml` - Training hyperparameters
+- `configs/run/` - Run pipelines (`default`, `triplets`)
 
 ## Usage
 
@@ -80,7 +85,21 @@ python src/train.py seed=123
 
 # Combine multiple overrides
 python src/train.py model=effv2s seed=999 training.epochs=75
+
+# Run the triplet experiment pipeline
+python src/train.py run=triplets
+
+# Triplet run with custom manifest and mode
+python src/train.py run=triplets run.triplets.mode=shared run.triplets.manifest_path=/path/to/images_manifest_labeled.csv
 ```
+
+### Source Entry Points
+
+- `src/train.py` is the main Hydra entry point and now supports both `run=default` and `run=triplets`.
+- `src/engine/train.py` remains available for the modular baseline pipeline and explicitly guards against `run=triplets`.
+- Baseline and triplet experiments use different input sources:
+  - Baseline (`run=default`) reads `configs/data/dataloader.yaml` (`train_csv`, `val_csv`, semicolon-separated files).
+  - Triplets (`run=triplets`) reads `run.triplets.manifest_path` from `configs/run/triplets.yaml` (manifest-style CSV).
 
 ### Available Models
 
@@ -107,6 +126,7 @@ Vision-Module/
 ├── configs/           # Hydra configuration files
 │   ├── data/         # Data loading configs
 │   ├── model/        # Model architecture configs
+│   ├── run/          # Pipeline selection configs
 │   ├── training/     # Training hyperparameters
 │   └── config.yaml   # Main config
 ├── src/

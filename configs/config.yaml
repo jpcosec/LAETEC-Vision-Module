@@ -2,6 +2,7 @@ defaults:
   - model: shuffnetv2
   - data: dataloader
   - training: default
+  - run: default
 
 seed: 1000
 # device: cpu  # Will be updated in code
@@ -45,4 +46,4 @@ seed: 1000
 
 hydra:
   run:
-    dir: outputs/${model.model}/${seed}
+    dir: outputs/${run.output_subdir}

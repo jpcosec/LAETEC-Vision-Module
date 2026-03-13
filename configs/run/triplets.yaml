@@ -1,0 +1,28 @@
+pipeline: triplets
+entrypoint: src/train.py
+output_subdir: triplets/${run.triplets.mode}/${seed}
+wandb:
+  enabled: true
+  project: Stress-Identification-Triplets
+triplets:
+  mode: dual
+  manifest_path: /home/jp/Upla/datasets/stressid2x1103/images_manifest_labeled.csv
+  manifest_sep: ","
+  image_col: image_abspath
+  subject_col: subject
+  stress_col: binary_stress
+  label_found_col: label_found
+  label_found_value: 1
+  val_size: 0.2
+  subjects_per_batch: 8
+  images_per_subject: 4
+  num_workers: 0
+  embedding_dim: 128
+  margin_id: 0.3
+  margin_stress: 0.3
+  weight_id: 1.0
+  weight_stress: 1.0
+  require_diff_subject_for_positive: true
+  lr: 0.0001
+  epochs: 3
+  checkpoint_prefix: triplet
