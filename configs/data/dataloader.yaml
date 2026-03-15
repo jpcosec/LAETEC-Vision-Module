@@ -1,5 +1,5 @@
-train_csv: /mnt/data/StressID-img-data/train.csv
-val_csv: /mnt/data/StressID-img-data/val.csv
-test_csv: /mnt/data/StressID-img-data/test.csv
+train_csv: ${paths.train_csv}
+val_csv: ${paths.val_csv}
+test_csv: ${paths.test_csv}
 batch_size: 28
 num_workers: 4

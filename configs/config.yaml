@@ -3,6 +3,7 @@ defaults:
   - data: dataloader
   - training: default
   - run: default
+  - paths: local
 
 seed: 1000
 # device: cpu  # Will be updated in code

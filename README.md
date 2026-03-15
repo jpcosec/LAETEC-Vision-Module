@@ -41,37 +41,68 @@ New here? Start with `docs/entrypoint.md`.
 
 ## Configuration
 
-Before running, configure your data paths in `configs/data/dataloader.yaml`:
+### Machine-specific paths (required)
+
+All dataset paths are centralized in a single gitignored file:
+
+```
+configs/paths/local.yaml
+```
+
+This file is not committed to the repository. Each machine must create its own. Copy the template and fill in your paths:
 
 ```yaml
+# configs/paths/local.yaml
 train_csv: /path/to/your/train.csv
 val_csv: /path/to/your/val.csv
 test_csv: /path/to/your/test.csv
-batch_size: 28
-num_workers: 4
+triplet_manifest: /path/to/your/images_manifest_labeled.csv
 ```
+
+All other configs (`dataloader.yaml`, `triplets.yaml`) reference these paths via Hydra interpolation (`${paths.train_csv}`, etc.) — no hardcoded paths anywhere else.
 
 ### Configuration Files
 
-- `configs/config.yaml` - Main configuration (seed, model selection)
-- `configs/model/` - Model architectures (effb2, effv2s, mobilev3s)
+- `configs/config.yaml` - Main config (seed, model, pipeline selection)
+- `configs/paths/local.yaml` - **Machine-specific paths (gitignored, create manually)**
+- `configs/model/` - Model architectures (`effb2`, `effv2s`, `mobilev3s`, etc.)
 - `configs/data/dataloader.yaml` - Data loading parameters
 - `configs/training/default.yaml` - Training hyperparameters
-- `configs/run/` - Run pipelines (`default`, `triplets`)
+- `configs/run/default.yaml` - Classification pipeline config
+- `configs/run/triplets.yaml` - Triplet loss pipeline config
 
 ## Usage
 
 ### Basic Training
 
-Run training with default settings (EfficientNet-B2, seed=42):
-
 ```bash
 python src/train.py
 ```
 
+### Triplet Loss Pipeline
+
+```bash
+python src/train.py run=triplets
+```
+
+Triplet training uses `paths.triplet_manifest` from your `configs/paths/local.yaml`. The manifest must be a semicolon-separated CSV with these columns:
+
+| Column | Description |
+|--------|-------------|
+| `path` | Absolute path to the image |
+| `subject` | Subject identifier |
+| `label` | Stress label (0 or 1) |
+
+This matches the standard `dataframe.csv` produced by this project. Other formats are not supported — adapt your manifest to this schema before running.
+
+To run with shared embedding head instead of dual:
+```bash
+python src/train.py run=triplets run.triplets.mode=shared
+```
+
 ### Custom Configuration
 
-Override specific parameters:
+Override any parameter at runtime:
 
 ```bash
 # Change model
@@ -85,12 +116,6 @@ python src/train.py seed=123
 
 # Combine multiple overrides
 python src/train.py model=effv2s seed=999 training.epochs=75
-
-# Run the triplet experiment pipeline
-python src/train.py run=triplets
-
-# Triplet run with custom manifest and mode
-python src/train.py run=triplets run.triplets.mode=shared run.triplets.manifest_path=/path/to/images_manifest_labeled.csv
 ```
 
 ### Source Entry Points

@@ -6,13 +6,7 @@ wandb:
   project: Stress-Identification-Triplets
 triplets:
   mode: dual
-  manifest_path: /home/jp/Upla/datasets/stressid2x1103/images_manifest_labeled.csv
-  manifest_sep: ","
-  image_col: image_abspath
-  subject_col: subject
-  stress_col: binary_stress
-  label_found_col: label_found
-  label_found_value: 1
+  manifest_path: ${paths.triplet_manifest}
   val_size: 0.2
   subjects_per_batch: 8
   images_per_subject: 4

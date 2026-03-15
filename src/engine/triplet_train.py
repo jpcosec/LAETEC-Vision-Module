@@ -142,27 +142,18 @@ class DualEmbeddingModel(nn.Module):
 
 
 def load_triplet_manifest(triplet_cfg: DictConfig) -> pd.DataFrame:
-    df = pd.read_csv(triplet_cfg.manifest_path, sep=triplet_cfg.manifest_sep)
+    df = pd.read_csv(triplet_cfg.manifest_path, sep=";")
 
-    if triplet_cfg.label_found_col in df.columns:
-        df = df[df[triplet_cfg.label_found_col] == triplet_cfg.label_found_value]
-
-    required_cols = [
-        triplet_cfg.image_col,
-        triplet_cfg.subject_col,
-        triplet_cfg.stress_col,
-    ]
-    missing = [column for column in required_cols if column not in df.columns]
+    missing = [c for c in ["path", "subject", "label"] if c not in df.columns]
     if missing:
-        missing_str = ", ".join(missing)
-        raise ValueError(f"Missing required columns in manifest: {missing_str}")
+        raise ValueError(f"Missing required columns in manifest: {', '.join(missing)}")
 
     df = df.copy()
-    df[triplet_cfg.image_col] = df[triplet_cfg.image_col].astype(str)
-    df = df[df[triplet_cfg.image_col].map(lambda path: Path(path).exists())].copy()
+    df["path"] = df["path"].astype(str)
+    df = df[df["path"].map(lambda p: Path(p).exists())].copy()
 
-    df["stress_label"] = df[triplet_cfg.stress_col].astype(int)
-    df["subject_id"] = pd.Categorical(df[triplet_cfg.subject_col]).codes
+    df["stress_label"] = df["label"].astype(int)
+    df["subject_id"] = pd.Categorical(df["subject"]).codes
     return df.reset_index(drop=True)
 
 
@@ -199,8 +190,8 @@ def build_triplet_loaders(
         ]
     )
 
-    train_ds = StressTripletDataset(train_df, triplet_cfg.image_col, train_tf)
-    val_ds = StressTripletDataset(val_df, triplet_cfg.image_col, val_tf)
+    train_ds = StressTripletDataset(train_df, "path", train_tf)
+    val_ds = StressTripletDataset(val_df, "path", val_tf)
 
     train_sampler = SubjectBalancedBatchSampler(
         train_df,

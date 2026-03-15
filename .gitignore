@@ -36,4 +36,4 @@ logs/
 
 *.pth
 *.csv
-.markdownlint.json
+.markdownlint.jsonconfigs/paths/local.yaml

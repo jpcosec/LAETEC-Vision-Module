@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-03-14
+
+- Centralized all machine-specific dataset paths into `configs/paths/local.yaml` (gitignored), eliminating hardcoded paths across config files.
+- Added `configs/paths/` as a Hydra config group; `local.yaml` is the default and must be created manually on each machine.
+- Updated `configs/data/dataloader.yaml` and `configs/run/triplets.yaml` to reference paths via Hydra interpolation (`${paths.*}`).
+- Updated README with setup instructions for `configs/paths/local.yaml` and correct usage for both classification and triplet pipelines.
+- Fixed subject-based data splitting: created pre-split `train.csv`, `val.csv`, `test.csv` with zero subject overlap (42/5/6 subjects respectively).
+- Added `get_data_loaders_from_split_files()` to replace runtime splitting that caused subject leakage.
+
 ## 2026-03-13
 
 - Added Hydra run group under `configs/run/` with `default` and `triplets` pipelines, keeping baseline behavior unchanged via `run=default`.

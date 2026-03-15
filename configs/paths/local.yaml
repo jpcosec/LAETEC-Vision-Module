@@ -1,0 +1,4 @@
+train_csv: /mnt/data/StressID-img-data/train.csv
+val_csv: /mnt/data/StressID-img-data/val.csv
+test_csv: /mnt/data/StressID-img-data/test.csv
+triplet_manifest: /mnt/data/StressID-img-data/train.csv
